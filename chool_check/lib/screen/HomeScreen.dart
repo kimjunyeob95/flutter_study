@@ -39,6 +39,8 @@ class _HomeScreenState extends State<HomeScreen> {
   static const Marker marker =
       Marker(markerId: MarkerId('marker'), position: companyLatLng);
 
+  bool coolcheckDone = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,8 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           start.longitude,
                           end.latitude,
                           end.longitude);
-
-                      if (distance <= okDistance){
+                      if (distance <= okDistance) {
                         // 현재 위치와 회사와의 거리가 100M이내에 있는지 분기
                         isWithinRange = true;
                       }
@@ -80,9 +81,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         _renderGoogleMap(
                             initialPosition: initialPosition,
-                            circle: isWithinRange ? withinDistanceCircle: notWithinDistanceCircle,
+                            circle: coolcheckDone
+                                ? doneWithinDistanceCircle
+                                : isWithinRange
+                                    ? withinDistanceCircle
+                                    : notWithinDistanceCircle,
                             marker: marker),
-                        const _renderCoolguen()
+                        _renderCoolguen(
+                            isWithinRange: isWithinRange,
+                            onCheckPressed: onCheckPressed,
+                            coolcheckDone: coolcheckDone)
                       ],
                     );
                   });
@@ -93,6 +101,33 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           },
         ));
+  }
+
+  void onCheckPressed() async {
+    final bool result = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("출근하기"),
+            content: const Text("출근을 하시겠습니까?"),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                  child: Text('닫기')),
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: Text('출근'))
+            ],
+          );
+        });
+
+    setState(() {
+      coolcheckDone = result;
+    });
   }
 
   Future<String> checkPermission() async {
@@ -162,10 +197,35 @@ class _renderGoogleMap extends StatelessWidget {
 }
 
 class _renderCoolguen extends StatelessWidget {
-  const _renderCoolguen({Key? key}) : super(key: key);
+  final bool isWithinRange;
+  final VoidCallback onCheckPressed;
+  final bool coolcheckDone;
+
+  const _renderCoolguen(
+      {required this.isWithinRange,
+      required this.onCheckPressed,
+      required this.coolcheckDone,
+      Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const Expanded(flex: 1, child: Text('출근'));
+    return Expanded(
+        flex: 1,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.timelapse,
+              size: 50.0,
+              color: coolcheckDone ? Colors.green : isWithinRange ? Colors.blue : Colors.red,
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            if (isWithinRange && !coolcheckDone)
+              TextButton(onPressed: onCheckPressed, child: const Text('출근'))
+          ],
+        ));
   }
 }
