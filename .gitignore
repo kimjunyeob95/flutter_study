@@ -10,6 +10,7 @@
 **/.svn/
 **/test
 **/migrate_working_dir/
+**/lib/const/agora.dart
 
 # IntelliJ related
 **/*.iml
