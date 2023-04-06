@@ -13,6 +13,7 @@ class _HomeScreenState extends State<HomeScreen> {
   static const LatLng companyLatLng = LatLng(37.5284, 127.1392);
   static const CameraPosition initialPosition =
       CameraPosition(target: companyLatLng, zoom: 15);
+  GoogleMapController? mapController;
 
   static const double okDistance = 100;
   static final Circle withinDistanceCircle = Circle(
@@ -80,13 +81,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     return Column(
                       children: [
                         _renderGoogleMap(
-                            initialPosition: initialPosition,
-                            circle: coolcheckDone
-                                ? doneWithinDistanceCircle
-                                : isWithinRange
-                                    ? withinDistanceCircle
-                                    : notWithinDistanceCircle,
-                            marker: marker),
+                          initialPosition: initialPosition,
+                          circle: coolcheckDone
+                              ? doneWithinDistanceCircle
+                              : isWithinRange
+                                  ? withinDistanceCircle
+                                  : notWithinDistanceCircle,
+                          marker: marker,
+                          onMapCreated: onMapCreated,
+                        ),
                         _renderCoolguen(
                             isWithinRange: isWithinRange,
                             onCheckPressed: onCheckPressed,
@@ -101,6 +104,10 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           },
         ));
+  }
+
+  onMapCreated(GoogleMapController controller) {
+    mapController = controller;
   }
 
   void onCheckPressed() async {
@@ -165,6 +172,20 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       backgroundColor: Colors.white,
+      actions: [
+        IconButton(
+          onPressed: () async {
+            if (mapController != null) {
+              final currentPostion =
+                  await Geolocator.getCurrentPosition();
+              mapController!
+                  .animateCamera(CameraUpdate.newLatLng(LatLng(currentPostion.latitude, currentPostion.longitude)));
+            }
+          },
+          icon: const Icon(Icons.my_location),
+          color: Colors.blue,
+        )
+      ],
     );
   }
 }
@@ -173,11 +194,13 @@ class _renderGoogleMap extends StatelessWidget {
   final CameraPosition initialPosition;
   final Circle circle;
   final Marker marker;
+  final MapCreatedCallback onMapCreated;
 
   const _renderGoogleMap(
       {required this.circle,
       required this.marker,
       required this.initialPosition,
+      required this.onMapCreated,
       Key? key})
       : super(key: key);
 
@@ -191,6 +214,7 @@ class _renderGoogleMap extends StatelessWidget {
         myLocationEnabled: true,
         circles: Set.from([circle]),
         markers: Set.from([marker]),
+        onMapCreated: onMapCreated,
       ),
     );
   }
@@ -218,7 +242,11 @@ class _renderCoolguen extends StatelessWidget {
             Icon(
               Icons.timelapse,
               size: 50.0,
-              color: coolcheckDone ? Colors.green : isWithinRange ? Colors.blue : Colors.red,
+              color: coolcheckDone
+                  ? Colors.green
+                  : isWithinRange
+                      ? Colors.blue
+                      : Colors.red,
             ),
             const SizedBox(
               height: 20,
