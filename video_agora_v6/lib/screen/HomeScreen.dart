@@ -31,28 +31,30 @@ class _Logo extends StatelessWidget {
     return Center(
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.blue,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.blue[300]!,
-              blurRadius: 12,
-              spreadRadius: 2
-            )
-          ]
-        ),
+            color: Colors.blue,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.blue[300]!, blurRadius: 12, spreadRadius: 2)
+            ]),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: const [
-              Icon(Icons.videocam,color: Colors.white, size: 40,),
-              SizedBox(width: 12,),
-              Text("LIVE",style: TextStyle(
+              Icon(
+                Icons.videocam,
                 color: Colors.white,
-                fontSize: 30.0,
-                letterSpacing: 4
-              ),)
+                size: 40,
+              ),
+              SizedBox(
+                width: 12,
+              ),
+              Text(
+                "LIVE",
+                style: TextStyle(
+                    color: Colors.white, fontSize: 30.0, letterSpacing: 4),
+              )
             ],
           ),
         ),
@@ -66,7 +68,9 @@ class _Image extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Image.asset("asset/img/home_img.png"),);
+    return Center(
+      child: Image.asset("asset/img/home_img.png"),
+    );
   }
 }
 
@@ -79,7 +83,11 @@ class _Button extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        ElevatedButton(onPressed: (){}, child: Text('입장하기')),
+        ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed("/camScreen");
+            },
+            child: Text('입장하기')),
       ],
     );
   }
