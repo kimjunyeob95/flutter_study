@@ -1,3 +1,4 @@
+import "package:calendar_scheduler/component/schedule_card.dart";
 import "package:calendar_scheduler/component/today_banner.dart";
 import "package:flutter/material.dart";
 import "package:calendar_scheduler/component/calendar.dart";
@@ -29,6 +30,14 @@ class _HomeScreenState extends State<HomeScreen> {
             TodayBanner(
               selectedDay: selectedDay,
               scheduleCount: 3,
+            ),
+            const SizedBox(
+              height: 8,
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: ScheduleCard(
+                  startTime: 3, endTime: 4, content: "내용", color: Colors.red),
             )
           ],
         ),
