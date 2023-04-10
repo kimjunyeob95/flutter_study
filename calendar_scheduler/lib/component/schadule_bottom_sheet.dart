@@ -9,33 +9,40 @@ class ScheduleBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
-    return Container(
-        color: Colors.white,
-        height: (MediaQuery.of(context).size.height / 2) + bottomInset,
-        child: Padding(
-            padding: const EdgeInsets.only(
-              top: 16,
-              left: 8,
-              right: 8,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                _Time(),
-                SizedBox(
-                  height: 16,
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).requestFocus(FocusNode());
+      },
+      child: SafeArea(
+        child: Container(
+            color: Colors.white,
+            height: (MediaQuery.of(context).size.height / 2) + bottomInset,
+            child: Padding(
+                padding: const EdgeInsets.only(
+                  top: 16,
+                  left: 8,
+                  right: 8,
                 ),
-                _Content(),
-                SizedBox(
-                  height: 16,
-                ),
-                _ColorPicker(),
-                SizedBox(
-                  height: 8,
-                ),
-                _SaveButton(),
-              ],
-            )));
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    _Time(),
+                    SizedBox(
+                      height: 16,
+                    ),
+                    _Content(),
+                    SizedBox(
+                      height: 16,
+                    ),
+                    _ColorPicker(),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    _SaveButton(),
+                  ],
+                ))),
+      ),
+    );
   }
 }
 
@@ -49,14 +56,12 @@ class _Time extends StatelessWidget {
         Expanded(
             child: CustomTextField(
           label: "시작 시간",
+          inputType: "number",
         )),
         SizedBox(
           width: 16,
         ),
-        Expanded(
-            child: CustomTextField(
-          label: "마감 시간",
-        )),
+        Expanded(child: CustomTextField(label: "마감 시간", inputType: "number")),
       ],
     );
   }
@@ -67,9 +72,8 @@ class _Content extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const CustomTextField(
-      label: "내용",
-    );
+    return const Expanded(
+        child: CustomTextField(label: "내용", inputType: "text"));
   }
 }
 
