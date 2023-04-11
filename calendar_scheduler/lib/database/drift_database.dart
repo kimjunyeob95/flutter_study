@@ -19,7 +19,7 @@ class LocalDatabase extends _$LocalDatabase {
   Future<int> createSchedule(SchedulesCompanion data) =>
       into(schedules).insert(data);
 
-  Future<int> createCategory(CategoryColorsCompanion data) =>
+  Future<int> createCategoryColors(CategoryColorsCompanion data) =>
       into(categoryColors).insert(data);
 
   Future<List<CategoryColor>> getCategoryColors() =>
@@ -30,7 +30,7 @@ class LocalDatabase extends _$LocalDatabase {
   // TODO: implement schemaVersion
   // DB의 table이 번경 할 때마다 버전 업해야함 초기값은 1
   int get schemaVersion => 1;
-}}
+}
 
 // 4. DB연결 설정
 LazyDatabase _openConnection() {
