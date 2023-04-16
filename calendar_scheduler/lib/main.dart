@@ -1,9 +1,9 @@
 import 'package:calendar_scheduler/database/drift_database.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'screen/home_screen.dart';
-import 'package:calendar_scheduler/database/drift_database.dart';
 
 const DEFAULT_COLORS = [
   'F44336', // 빨강
@@ -28,6 +28,10 @@ void main() async {
   await initializeDateFormatting(); // 2. intl formatting 설정
 
   final database = LocalDatabase();
+
+  // DI 의존성 주입
+  GetIt.I.registerSingleton<LocalDatabase>(database);
+  
   final List colorList = await database.getCategoryColors();
   if (colorList.isEmpty) {
     for (String hexCode in DEFAULT_COLORS) {

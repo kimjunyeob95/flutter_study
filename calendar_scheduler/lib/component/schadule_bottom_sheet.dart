@@ -1,6 +1,9 @@
 import "package:calendar_scheduler/component/custom_text_field.dart";
 import "package:calendar_scheduler/const/colors.dart";
+import "package:calendar_scheduler/database/drift_database.dart";
+import "package:calendar_scheduler/model/category_color.dart";
 import "package:flutter/material.dart";
+import "package:get_it/get_it.dart";
 
 class ScheduleBottomSheet extends StatefulWidget {
   const ScheduleBottomSheet({Key? key}) : super(key: key);
@@ -54,7 +57,19 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet> {
                         const SizedBox(
                           height: 16,
                         ),
-                        const _ColorPicker(),
+                        FutureBuilder<List<CategoryColor>>(
+                            future:
+                                GetIt.I<LocalDatabase>().getCategoryColors(),
+                            builder: (context, snapshot) {
+                              return _ColorPicker(
+                                colors: snapshot.hasData
+                                    ? snapshot.data!
+                                        .map((e) =>
+                                            Color(int.parse('FF${e.hexCode}', radix: 16)))
+                                        .toList()
+                                    : [],
+                              );
+                            }),
                         const SizedBox(
                           height: 8,
                         ),
@@ -82,13 +97,15 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet> {
     }
   }
 
-  void onStartSaved(String? val){
+  void onStartSaved(String? val) {
     startTime = int.parse(val!);
   }
-  void onEndSaved(String? val){
+
+  void onEndSaved(String? val) {
     endTime = int.parse(val!);
   }
-  void onContentSaved(String? val){
+
+  void onContentSaved(String? val) {
     content = val!;
   }
 }
@@ -141,16 +158,16 @@ class _Content extends StatelessWidget {
 }
 
 class _ColorPicker extends StatelessWidget {
-  const _ColorPicker({Key? key}) : super(key: key);
+  final List<Color> colors;
+
+  const _ColorPicker({required this.colors, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final List<Color> colorList = [Colors.red, Colors.yellow, Colors.black];
-
     return Wrap(
       spacing: 8,
       runSpacing: 10,
-      children: colorList.map((e) => renderColor(e)).toList(),
+      children: colors.map((e) => renderColor(e)).toList(),
     );
   }
 
