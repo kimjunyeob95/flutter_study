@@ -25,11 +25,17 @@ class LocalDatabase extends _$LocalDatabase {
   Future<List<CategoryColor>> getCategoryColors() =>
       select(categoryColors).get();
 
-  Stream<List<Schedule>> watchSchedules()=>
-      select(schedules).watch();
+  Stream<List<Schedule>> watchSchedules(DateTime date) {
+    // 방법 1 정석
+    // final query = select(schedules);
+    // query.where((tbl) => tbl.date.equals(date));
+    // return query.watch();
+
+    // 방법 2
+    return (select(schedules)..where((tbl) => tbl.date.equals(date))).watch();
 
 
-
+  }
   @override
   // TODO: implement schemaVersion
   // DB의 table이 번경 할 때마다 버전 업해야함 초기값은 1

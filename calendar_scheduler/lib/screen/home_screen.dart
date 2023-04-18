@@ -86,30 +86,35 @@ class _ScheduleList extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: StreamBuilder<List<Schedule>>(
-            stream: GetIt.I<LocalDatabase>().watchSchedules(),
+            stream: GetIt.I<LocalDatabase>().watchSchedules(selectedDay),
             builder: (context, snapshot) {
-              List<Schedule> schedules = [];
+              if(!snapshot.hasData){
+                // 데이터 불러올 때 hasData = null 체크
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+
+              if(snapshot.data!.isEmpty && snapshot.hasData){
+                return const Center(child: Text('등록 된 스케줄이 없습니다.'),);
+              }
 
               return ListView.separated(
-                itemCount: snapshot.hasData ? snapshot.data!.length : 0,
+                itemCount: snapshot.hasData ?  snapshot.data!.length : 0,
                 separatorBuilder: (BuildContext context, int index) {
                   return const SizedBox(
                     height: 8,
                   );
                 },
                 itemBuilder: (BuildContext context, int index) {
-                  if (snapshot.data!.isEmpty) return null;
-                  print(selectedDay);
-                  print(snapshot.data);
-                  schedules = snapshot.data!
-                      .where((e) => e.date == selectedDay)
-                      .toList();
+                  if (!snapshot.hasData) return null;
 
-                  snapshot.data!.map((e) => ScheduleCard(
-                      startTime: e.startTime,
-                      endTime: e.endTime,
-                      content: e.content,
-                      color: Colors.red));
+                  final schedule = snapshot.data![index];
+                  return ScheduleCard(
+                      startTime: schedule.startTime,
+                      endTime: schedule.endTime,
+                      content: schedule.content,
+                      color: Colors.red);
                 },
               );
             }),
