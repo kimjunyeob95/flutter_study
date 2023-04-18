@@ -2,11 +2,15 @@ import "package:calendar_scheduler/component/custom_text_field.dart";
 import "package:calendar_scheduler/const/colors.dart";
 import "package:calendar_scheduler/database/drift_database.dart";
 import "package:calendar_scheduler/model/category_color.dart";
+import "package:drift/drift.dart" show Value;
 import "package:flutter/material.dart";
 import "package:get_it/get_it.dart";
 
 class ScheduleBottomSheet extends StatefulWidget {
-  const ScheduleBottomSheet({Key? key}) : super(key: key);
+  final DateTime seletedDate;
+
+  const ScheduleBottomSheet({required this.seletedDate, Key? key})
+      : super(key: key);
 
   @override
   State<ScheduleBottomSheet> createState() => _ScheduleBottomSheetState();
@@ -41,7 +45,7 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet> {
                   ),
                   child: Form(
                     key: formKey,
-                    autovalidateMode: AutovalidateMode.always,
+                    // autovalidateMode: AutovalidateMode.always, // 자동 validation
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -69,7 +73,7 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet> {
                               }
                               return _ColorPicker(
                                 colors: snapshot.hasData ? snapshot.data! : [],
-                                selectedColorId: selectedColorId!,
+                                selectedColorId: selectedColorId,
                                 colorIdSetter: (int id) {
                                   setState(() {
                                     selectedColorId = id;
@@ -91,7 +95,7 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet> {
     );
   }
 
-  void onSavePressed() {
+  void onSavePressed() async{
     if (formKey.currentState == null) {
       // formKey는 생성했는데 Form위젯과 결합이 안되었을 경우
       // 이미 key에 설정을 해놔서 현재 상황에서는 해당 안되긴함
@@ -101,6 +105,19 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet> {
     // TextFormField에서 validator를 1차로 거쳐서 옴
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
+
+      final key = await await GetIt.I<LocalDatabase>().createSchedule(
+        SchedulesCompanion(
+            date: Value(widget.seletedDate),
+            startTime: Value(startTime!),
+            endTime: Value(endTime!),
+            content: Value(content!),
+            colorId: Value(selectedColorId!)
+        ),
+      );
+
+      print("save 완료 key: $key");
+      Navigator.of(context).pop();
     }
   }
 
@@ -168,7 +185,7 @@ typedef ColorIdSetter = void Function(int id);
 
 class _ColorPicker extends StatelessWidget {
   final List<CategoryColor> colors;
-  final int selectedColorId;
+  final int? selectedColorId;
   final ColorIdSetter colorIdSetter;
 
   const _ColorPicker(

@@ -48,10 +48,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return FloatingActionButton(
       onPressed: () {
         showModalBottomSheet(
-          isScrollControlled: true,
+            isScrollControlled: true,
             context: context,
             builder: (_) {
-              return ScheduleBottomSheet();
+              return ScheduleBottomSheet(
+                seletedDate: selectedDay,
+              );
             });
       },
       backgroundColor: PRIMARY_COLOR,
