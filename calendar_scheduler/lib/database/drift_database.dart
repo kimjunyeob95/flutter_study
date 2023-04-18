@@ -25,6 +25,10 @@ class LocalDatabase extends _$LocalDatabase {
   Future<List<CategoryColor>> getCategoryColors() =>
       select(categoryColors).get();
 
+  Stream<List<Schedule>> watchSchedules()=>
+      select(schedules).watch();
+
+
 
   @override
   // TODO: implement schemaVersion

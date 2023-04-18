@@ -2,8 +2,10 @@ import "package:calendar_scheduler/component/schadule_bottom_sheet.dart";
 import "package:calendar_scheduler/component/schedule_card.dart";
 import "package:calendar_scheduler/component/today_banner.dart";
 import "package:calendar_scheduler/const/colors.dart";
+import "package:calendar_scheduler/database/drift_database.dart";
 import "package:flutter/material.dart";
 import "package:calendar_scheduler/component/calendar.dart";
+import "package:get_it/get_it.dart";
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -13,7 +15,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  DateTime selectedDay = DateTime.now();
+  DateTime selectedDay = DateTime.utc(
+    DateTime.now().year,
+    DateTime.now().month,
+    DateTime.now().day,
+  );
   DateTime focusedDay = DateTime.now();
 
   @override
@@ -37,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(
               height: 8,
             ),
-            _ScheduleList(),
+            _ScheduleList(selectedDay: selectedDay),
           ],
         ),
       ),
@@ -70,25 +76,43 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class _ScheduleList extends StatelessWidget {
-  const _ScheduleList({Key? key}) : super(key: key);
+  final DateTime selectedDay;
+
+  const _ScheduleList({required this.selectedDay, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: ListView.separated(
-          itemCount: 3,
-          separatorBuilder: (BuildContext context, int index) {
-            return const SizedBox(
-              height: 8,
-            );
-          },
-          itemBuilder: (BuildContext context, int index) {
-            return ScheduleCard(
-                startTime: 3, endTime: 4, content: "내용", color: Colors.red);
-          },
-        ),
+        child: StreamBuilder<List<Schedule>>(
+            stream: GetIt.I<LocalDatabase>().watchSchedules(),
+            builder: (context, snapshot) {
+              List<Schedule> schedules = [];
+
+              return ListView.separated(
+                itemCount: snapshot.hasData ? snapshot.data!.length : 0,
+                separatorBuilder: (BuildContext context, int index) {
+                  return const SizedBox(
+                    height: 8,
+                  );
+                },
+                itemBuilder: (BuildContext context, int index) {
+                  if (snapshot.data!.isEmpty) return null;
+                  print(selectedDay);
+                  print(snapshot.data);
+                  schedules = snapshot.data!
+                      .where((e) => e.date == selectedDay)
+                      .toList();
+
+                  snapshot.data!.map((e) => ScheduleCard(
+                      startTime: e.startTime,
+                      endTime: e.endTime,
+                      content: e.content,
+                      color: Colors.red));
+                },
+              );
+            }),
       ),
     );
   }
