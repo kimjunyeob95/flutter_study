@@ -2,6 +2,7 @@
 import "dart:io";
 import "package:calendar_scheduler/model/category_color.dart";
 import "package:calendar_scheduler/model/schedule.dart";
+import "package:calendar_scheduler/model/schedule_with_color.dart";
 import "package:drift/drift.dart";
 import "package:drift/native.dart";
 import "package:path/path.dart" as p;
@@ -25,17 +26,26 @@ class LocalDatabase extends _$LocalDatabase {
   Future<List<CategoryColor>> getCategoryColors() =>
       select(categoryColors).get();
 
-  Stream<List<Schedule>> watchSchedules(DateTime date) {
+  Stream<List<ScheduleWithColor>> watchSchedules(DateTime date) {
     // 방법 1 정석
     // final query = select(schedules);
     // query.where((tbl) => tbl.date.equals(date));
     // return query.watch();
-
     // 방법 2
-    return (select(schedules)..where((tbl) => tbl.date.equals(date))).watch();
+    // return (select(schedules)..where((tbl) => tbl.date.equals(date))).watch();
 
+    final query = select(schedules).join([
+      innerJoin(categoryColors, categoryColors.id.equalsExp(schedules.colorId))
+    ]);
+    query.where(schedules.date!.equals(date));
 
+    return query.watch().map((rows) => rows
+        .map((row) => ScheduleWithColor(
+            schedule: row.readTable(schedules),
+            categoryColor: row.readTable(categoryColors)))
+        .toList());
   }
+
   @override
   // TODO: implement schemaVersion
   // DB의 table이 번경 할 때마다 버전 업해야함 초기값은 1
