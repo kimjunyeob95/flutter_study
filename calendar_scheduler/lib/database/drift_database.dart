@@ -1,4 +1,5 @@
 // private 값들은 불러올 수 없다.
+import "dart:developer";
 import "dart:io";
 import "package:calendar_scheduler/model/category_color.dart";
 import "package:calendar_scheduler/model/schedule.dart";
@@ -37,7 +38,10 @@ class LocalDatabase extends _$LocalDatabase {
     final query = select(schedules).join([
       innerJoin(categoryColors, categoryColors.id.equalsExp(schedules.colorId))
     ]);
-    query.where(schedules.date!.equals(date));
+    query.where(schedules.date.equals(date));
+    query.orderBy([
+      OrderingTerm.asc(schedules.startTime)
+    ]);
 
     return query.watch().map((rows) => rows
         .map((row) => ScheduleWithColor(
