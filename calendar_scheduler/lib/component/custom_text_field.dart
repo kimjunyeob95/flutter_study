@@ -62,7 +62,10 @@ class CustomTextField extends StatelessWidget {
           [FilteringTextInputFormatter.digitsOnly]
           : [],
       decoration: InputDecoration(
-          border: InputBorder.none, filled: true, fillColor: Colors.grey[300]),
+          border: InputBorder.none,
+          filled: true,
+          fillColor: Colors.grey[300],
+          suffixText: inputType == "number" ? "시" : ""),
     );
   }
 }

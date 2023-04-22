@@ -27,6 +27,11 @@ class LocalDatabase extends _$LocalDatabase {
   Future<List<CategoryColor>> getCategoryColors() =>
       select(categoryColors).get();
 
+  // 삭제한 id값 return 받음
+  Future<int> deleteSchedule(int id) {
+    return (delete(schedules)..where((tbl) => tbl.id.equals(id))).go();
+  }
+
   Stream<List<ScheduleWithColor>> watchSchedules(DateTime date) {
     // 방법 1 정석
     // final query = select(schedules);
@@ -39,9 +44,7 @@ class LocalDatabase extends _$LocalDatabase {
       innerJoin(categoryColors, categoryColors.id.equalsExp(schedules.colorId))
     ]);
     query.where(schedules.date.equals(date));
-    query.orderBy([
-      OrderingTerm.asc(schedules.startTime)
-    ]);
+    query.orderBy([OrderingTerm.asc(schedules.startTime)]);
 
     return query.watch().map((rows) => rows
         .map((row) => ScheduleWithColor(

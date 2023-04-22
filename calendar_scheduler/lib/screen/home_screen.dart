@@ -41,7 +41,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             TodayBanner(
               selectedDay: selectedDay,
-              scheduleCount: 3,
             ),
             const SizedBox(
               height: 8,
@@ -106,18 +105,25 @@ class _ScheduleList extends StatelessWidget {
                 itemCount: snapshot.hasData ?  snapshot.data!.length : 0,
                 separatorBuilder: (BuildContext context, int index) {
                   return const SizedBox(
-                    height: 8,
+                    height: 8
                   );
                 },
                 itemBuilder: (BuildContext context, int index) {
                   if (!snapshot.hasData) return null;
 
                   final scheduleWithColor = snapshot.data![index];
-                  return ScheduleCard(
-                      startTime: scheduleWithColor.schedule.startTime,
-                      endTime: scheduleWithColor.schedule.endTime,
-                      content: scheduleWithColor.schedule.content,
-                      color: Color(int.parse('FF${scheduleWithColor.categoryColor.hexCode}', radix: 16)),
+                  return Dismissible(
+                    key: ObjectKey(scheduleWithColor.schedule.id),
+                    direction: DismissDirection.endToStart, // 오른쪽에서 왼쪽으로 스와이프
+                    onDismissed: (DismissDirection direction){
+                      GetIt.I<LocalDatabase>().deleteSchedule(scheduleWithColor.schedule.id);
+                    },
+                    child: ScheduleCard(
+                        startTime: scheduleWithColor.schedule.startTime,
+                        endTime: scheduleWithColor.schedule.endTime,
+                        content: scheduleWithColor.schedule.content,
+                        color: Color(int.parse('FF${scheduleWithColor.categoryColor.hexCode}', radix: 16)),
+                    ),
                   );
                 },
               );
