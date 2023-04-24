@@ -21,6 +21,9 @@ class LocalDatabase extends _$LocalDatabase {
   Future<int> createSchedule(SchedulesCompanion data) =>
       into(schedules).insert(data);
 
+  Future<Schedule> getSchedule(int id) =>
+      (select(schedules)..where((tbl) => tbl.id.equals(id))).getSingle();
+
   Future<int> createCategoryColors(CategoryColorsCompanion data) =>
       into(categoryColors).insert(data);
 

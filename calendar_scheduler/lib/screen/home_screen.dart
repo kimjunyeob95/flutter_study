@@ -90,23 +90,23 @@ class _ScheduleList extends StatelessWidget {
         child: StreamBuilder<List<ScheduleWithColor>>(
             stream: GetIt.I<LocalDatabase>().watchSchedules(selectedDay),
             builder: (context, snapshot) {
-              if(!snapshot.hasData){
+              if (!snapshot.hasData) {
                 // 데이터 불러올 때 hasData = null 체크
                 return const Center(
                   child: CircularProgressIndicator(),
                 );
               }
 
-              if(snapshot.data!.isEmpty && snapshot.hasData){
-                return const Center(child: Text('등록 된 스케줄이 없습니다.'),);
+              if (snapshot.data!.isEmpty && snapshot.hasData) {
+                return const Center(
+                  child: Text('등록 된 스케줄이 없습니다.'),
+                );
               }
 
               return ListView.separated(
-                itemCount: snapshot.hasData ?  snapshot.data!.length : 0,
+                itemCount: snapshot.hasData ? snapshot.data!.length : 0,
                 separatorBuilder: (BuildContext context, int index) {
-                  return const SizedBox(
-                    height: 8
-                  );
+                  return const SizedBox(height: 8);
                 },
                 itemBuilder: (BuildContext context, int index) {
                   if (!snapshot.hasData) return null;
@@ -115,14 +115,30 @@ class _ScheduleList extends StatelessWidget {
                   return Dismissible(
                     key: ObjectKey(scheduleWithColor.schedule.id),
                     direction: DismissDirection.endToStart, // 오른쪽에서 왼쪽으로 스와이프
-                    onDismissed: (DismissDirection direction){
-                      GetIt.I<LocalDatabase>().deleteSchedule(scheduleWithColor.schedule.id);
+                    onDismissed: (DismissDirection direction) {
+                      GetIt.I<LocalDatabase>()
+                          .deleteSchedule(scheduleWithColor.schedule.id);
                     },
-                    child: ScheduleCard(
+                    child: GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                            isScrollControlled: true,
+                            context: context,
+                            builder: (_) {
+                              return ScheduleBottomSheet(
+                                seletedDate: selectedDay,
+                                scheduleId: scheduleWithColor.schedule.id,
+                              );
+                            });
+                      },
+                      child: ScheduleCard(
                         startTime: scheduleWithColor.schedule.startTime,
                         endTime: scheduleWithColor.schedule.endTime,
                         content: scheduleWithColor.schedule.content,
-                        color: Color(int.parse('FF${scheduleWithColor.categoryColor.hexCode}', radix: 16)),
+                        color: Color(int.parse(
+                            'FF${scheduleWithColor.categoryColor.hexCode}',
+                            radix: 16)),
+                      ),
                     ),
                   );
                 },

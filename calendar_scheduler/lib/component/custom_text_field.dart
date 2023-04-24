@@ -6,11 +6,13 @@ class CustomTextField extends StatelessWidget {
   final String label;
   final String inputType;
   final FormFieldSetter<String> onSaved;
+  final String initialText;
 
   const CustomTextField(
       {required this.label,
       required this.inputType,
       required this.onSaved,
+      required this.initialText,
       Key? key})
       : super(key: key);
 
@@ -34,6 +36,7 @@ class CustomTextField extends StatelessWidget {
   Widget _textField() {
     return TextFormField(
       onSaved: onSaved,
+      initialValue: initialText,
       validator: (String? val) {
         if (val == null || val.isEmpty) {
           return "값을 입력해주세요.";
