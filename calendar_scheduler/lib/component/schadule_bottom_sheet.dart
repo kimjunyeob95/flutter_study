@@ -25,18 +25,11 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet> {
   String? content;
   int? selectedColorId;
 
-  String getStartTime = "";
-  String getEndTime = "";
-  String getContent = "";
-
   bool modify = false;
 
   @override
   Widget build(BuildContext context) {
-    final bottomInset = MediaQuery
-        .of(context)
-        .viewInsets
-        .bottom;
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
     return GestureDetector(
       onTap: () {
@@ -61,22 +54,18 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet> {
               );
             }
 
-            if (snapshot.hasData) {
-              getStartTime = snapshot.data!.startTime.toString().padLeft(2, "0");
-              getEndTime = snapshot.data!.endTime.toString().padLeft(2, "0");
-              getContent = snapshot.data!.content;
+            if (snapshot.hasData && startTime == null) {
+              startTime = snapshot.data!.startTime;
+              endTime = snapshot.data!.endTime;
+              content = snapshot.data!.content;
               selectedColorId = snapshot.data!.colorId;
-              modify = true;
             }
 
             return SafeArea(
               child: Container(
                   color: Colors.white,
                   height:
-                  (MediaQuery
-                      .of(context)
-                      .size
-                      .height / 2) + bottomInset,
+                      (MediaQuery.of(context).size.height / 2) + bottomInset,
                   child: Padding(
                     padding: EdgeInsets.only(bottom: bottomInset),
                     child: Padding(
@@ -94,15 +83,20 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet> {
                               _Time(
                                 onStartSaved: onStartSaved,
                                 onEndSaved: onEndSaved,
-                                getStartTime: getStartTime,
-                                getEndTime: getEndTime,
+                                getStartTime: startTime != null
+                                    ? startTime.toString().padLeft(2, "0")
+                                    : "",
+                                getEndTime: endTime != null
+                                    ? endTime.toString().padLeft(2, "0")
+                                    : "",
                               ),
                               const SizedBox(
                                 height: 16,
                               ),
                               _Content(
                                 onContentSaved: onContentSaved,
-                                getContent: getContent,
+                                getContent:
+                                    content != null ? content.toString() : "",
                               ),
                               const SizedBox(
                                 height: 16,
@@ -133,7 +127,8 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet> {
                               ),
                               _SaveButton(
                                 onPressed: onSavePressed,
-                                modify: modify,
+                                modify:
+                                    widget.scheduleId != null ? true : false,
                               ),
                             ],
                           ),
@@ -155,16 +150,29 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet> {
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
 
-      final key = await await GetIt.I<LocalDatabase>().createSchedule(
-        SchedulesCompanion(
-            date: Value(widget.seletedDate),
-            startTime: Value(startTime!),
-            endTime: Value(endTime!),
-            content: Value(content!),
-            colorId: Value(selectedColorId!)),
-      );
-
-      print("save 완료 key: $key");
+      if (widget.scheduleId == null) {
+        // 신규 등록
+        final key = await GetIt.I<LocalDatabase>().createSchedule(
+          SchedulesCompanion(
+              date: Value(widget.seletedDate),
+              startTime: Value(startTime!),
+              endTime: Value(endTime!),
+              content: Value(content!),
+              colorId: Value(selectedColorId!)),
+        );
+        print("save 완료 key: $key");
+      } else {
+        // 수정
+        final key = await GetIt.I<LocalDatabase>().updateScheduleById(
+            widget.scheduleId!,
+            SchedulesCompanion(
+                date: Value(widget.seletedDate),
+                startTime: Value(startTime!),
+                endTime: Value(endTime!),
+                content: Value(content!),
+                colorId: Value(selectedColorId!)));
+        print("modify 완료 key: $key");
+      }
       Navigator.of(context).pop();
     }
   }
@@ -188,11 +196,12 @@ class _Time extends StatelessWidget {
   final String getStartTime;
   final String getEndTime;
 
-  const _Time({required this.onStartSaved,
-    required this.onEndSaved,
-    required this.getStartTime,
-    required this.getEndTime,
-    Key? key})
+  const _Time(
+      {required this.onStartSaved,
+      required this.onEndSaved,
+      required this.getStartTime,
+      required this.getEndTime,
+      Key? key})
       : super(key: key);
 
   @override
@@ -201,21 +210,21 @@ class _Time extends StatelessWidget {
       children: [
         Expanded(
             child: CustomTextField(
-              label: "시작 시간",
-              inputType: "number",
-              onSaved: onStartSaved,
-              initialText: getStartTime,
-            )),
+          label: "시작 시간",
+          inputType: "number",
+          onSaved: onStartSaved,
+          initialText: getStartTime,
+        )),
         const SizedBox(
           width: 16,
         ),
         Expanded(
             child: CustomTextField(
-              label: "마감 시간",
-              inputType: "number",
-              onSaved: onEndSaved,
-              initialText: getEndTime,
-            )),
+          label: "마감 시간",
+          inputType: "number",
+          onSaved: onEndSaved,
+          initialText: getEndTime,
+        )),
       ],
     );
   }
@@ -233,11 +242,11 @@ class _Content extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
         child: CustomTextField(
-          label: "내용",
-          inputType: "text",
-          onSaved: onContentSaved,
-          initialText: getContent,
-        ));
+      label: "내용",
+      inputType: "text",
+      onSaved: onContentSaved,
+      initialText: getContent,
+    ));
   }
 }
 
@@ -248,10 +257,11 @@ class _ColorPicker extends StatelessWidget {
   final int? selectedColorId;
   final ColorIdSetter colorIdSetter;
 
-  const _ColorPicker({required this.colors,
-    required this.selectedColorId,
-    required this.colorIdSetter,
-    Key? key})
+  const _ColorPicker(
+      {required this.colors,
+      required this.selectedColorId,
+      required this.colorIdSetter,
+      Key? key})
       : super(key: key);
 
   @override
@@ -260,13 +270,12 @@ class _ColorPicker extends StatelessWidget {
       spacing: 8,
       runSpacing: 10,
       children: colors
-          .map((e) =>
-          GestureDetector(
-            onTap: () {
-              colorIdSetter(e.id);
-            },
-            child: renderColor(e, selectedColorId == e.id ? true : false),
-          ))
+          .map((e) => GestureDetector(
+                onTap: () {
+                  colorIdSetter(e.id);
+                },
+                child: renderColor(e, selectedColorId == e.id ? true : false),
+              ))
           .toList(),
     );
   }
@@ -289,8 +298,8 @@ class _SaveButton extends StatelessWidget {
   final VoidCallback onPressed;
   final bool modify;
 
-  const _SaveButton({required this.onPressed,
-    required this.modify, Key? key}) : super(key: key);
+  const _SaveButton({required this.onPressed, required this.modify, Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -302,7 +311,7 @@ class _SaveButton extends StatelessWidget {
                   backgroundColor: PRIMARY_COLOR,
                 ),
                 onPressed: onPressed,
-                child: modify ? Text('수정') : Text('저장'))),
+                child: modify ? const Text('수정') : const Text('저장'))),
       ],
     );
   }
