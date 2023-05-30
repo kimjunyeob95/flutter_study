@@ -1,6 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:scrollable_widgets/const/colors.dart';
 
+class _SliverFixedHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+  final double maxHeight;
+  final double minHeight;
+
+
+  _SliverFixedHeaderDelegate({
+    required this.child,
+    required this.maxHeight,
+    required this.minHeight
+  });
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset,
+      bool overlapsContent) {
+    return SizedBox.expand(child: child,);
+  }
+
+  @override
+  // 최대 높이
+  double get maxExtent => maxHeight;
+
+  @override
+  // 최소 높이
+  double get minExtent => minHeight;
+
+  @override
+  // covariand - 상속된 클래스도 사용가능
+  bool shouldRebuild(_SliverFixedHeaderDelegate oldDelegate) {
+
+  }
+
+
+}
+
 class CustomScrollViewScreen extends StatelessWidget {
   final List<int> numbers = List.generate(100, (index) => index);
 
@@ -14,6 +49,9 @@ class CustomScrollViewScreen extends StatelessWidget {
           slivers: [
             renderSliverAppbar(),
             renderBuilderListView(),
+            SliverPersistentHeader(delegate: _SliverFixedHeaderDelegate(
+                child:
+            )),
             renderBuilderGridListView(),
           ],
         ),
@@ -38,7 +76,7 @@ class CustomScrollViewScreen extends StatelessWidget {
       // 스크롤 위로 시 앱바의 최소 높이 값,
       flexibleSpace: FlexibleSpaceBar(
         background: Image.asset('asset/img/image_1.jpeg',
-        fit: BoxFit.cover,),
+          fit: BoxFit.cover,),
         title: Text('FlexibleSpaceBar'),
         centerTitle: true,
       ),
@@ -50,10 +88,11 @@ class CustomScrollViewScreen extends StatelessWidget {
   SliverList renderListView() {
     return SliverList(
         delegate: SliverChildListDelegate(numbers
-            .map((index) => renderContainer(
-                  color: rainbowColors[index % rainbowColors.length],
-                  index: index,
-                ))
+            .map((index) =>
+            renderContainer(
+              color: rainbowColors[index % rainbowColors.length],
+              index: index,
+            ))
             .toList()));
   }
 
@@ -61,21 +100,22 @@ class CustomScrollViewScreen extends StatelessWidget {
   SliverList renderBuilderListView() {
     return SliverList(
         delegate: SliverChildBuilderDelegate(childCount: 20, (context, index) {
-      return renderContainer(
-          color: rainbowColors[index % rainbowColors.length], index: index);
-    }));
+          return renderContainer(
+              color: rainbowColors[index % rainbowColors.length], index: index);
+        }));
   }
 
   // 3. GridView 한 번에 그림
   SliverGrid renderGridListView() {
     return SliverGrid(
         delegate: SliverChildListDelegate(numbers
-            .map((index) => renderContainer(
+            .map((index) =>
+            renderContainer(
                 color: rainbowColors[index % rainbowColors.length],
                 index: index))
             .toList()),
         gridDelegate:
-            SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2));
+        SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2));
   }
 
   // 4. GridView 화면에 보이는 영역만 그림
@@ -86,7 +126,7 @@ class CustomScrollViewScreen extends StatelessWidget {
               color: rainbowColors[index % rainbowColors.length], index: index);
         }),
         gridDelegate:
-            SliverGridDelegateWithMaxCrossAxisExtent(maxCrossAxisExtent: 200));
+        SliverGridDelegateWithMaxCrossAxisExtent(maxCrossAxisExtent: 200));
   }
 
   Widget renderContainer(
