@@ -1,4 +1,7 @@
+import 'package:dusty_dust/component/card_title.dart';
+import 'package:dusty_dust/component/category_card.dart';
 import 'package:dusty_dust/component/main_app_bar.dart';
+import 'package:dusty_dust/component/main_card.dart';
 import 'package:dusty_dust/component/main_drawer.dart';
 import 'package:dusty_dust/component/main_stat.dart';
 import 'package:dusty_dust/const/colors.dart';
@@ -19,53 +22,51 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 8.0),
-                  color: lightColor,
-                  shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(16.0))),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Container(
-                          decoration: const BoxDecoration(
-                              color: darkColor,
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(16.0),
-                                  topRight: Radius.circular(16.0))),
-                          child: const Padding(
-                            padding: EdgeInsets.all(4.0),
-                            child: Text(
-                              "종류별 통계",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w700),
-                            ),
-                          )),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          MainStat(
-                              category: "미세먼지",
-                              imgPath: "asset/img/best.png",
-                              level: "최고",
-                              stat: "0㎍/㎥"),
-                          MainStat(
-                              category: "미세먼지",
-                              imgPath: "asset/img/best.png",
-                              level: "최고",
-                              stat: "0㎍/㎥"),
-                          MainStat(
-                              category: "미세먼지",
-                              imgPath: "asset/img/best.png",
-                              level: "최고",
-                              stat: "0㎍/㎥")
-                        ],
-                      )
-                    ],
-                  ),
-                )
+                CategoryCard(),
+                const SizedBox(
+                  height: 16.0,
+                ),
+                MainCard(
+                    child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    CardTitle(
+                      title: "시간별 미세먼지",
+                    ),
+                    Column(
+                      children: List.generate(24, (index) {
+                        final now = DateTime.now();
+                        final hour = now.hour;
+                        int currentHour = hour - index;
+
+                        // 3 2 1 0 23 22 형식으로 시간을 표현
+                        if (currentHour < 0) {
+                          currentHour += 24;
+                        }
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0, vertical: 4.0),
+                          child: Row(
+                            children: [
+                              Expanded(child: Text("$currentHour시")),
+                              Expanded(
+                                child: Image.asset(
+                                  "asset/img/good.png",
+                                  height: 20.0,
+                                ),
+                              ),
+                              Expanded(
+                                  child: Text(
+                                "좋음",
+                                textAlign: TextAlign.right,
+                              ))
+                            ],
+                          ),
+                        );
+                      }),
+                    )
+                  ],
+                ))
               ],
             ),
           )

@@ -5,8 +5,11 @@ class MainStat extends StatelessWidget {
   final String imgPath;
   final String level;
   final String stat;
+  final double width;
 
-  MainStat({required this.category,
+  const MainStat({
+    required this.width,
+    required this.category,
     required this.imgPath,
     required this.level,
     required this.stat,
@@ -17,21 +20,25 @@ class MainStat extends StatelessWidget {
   Widget build(BuildContext context) {
     final ts = TextStyle(color: Colors.black);
 
-    return Column(
-      children: [
-        Text(
-          category,
-          style: ts,
-        ),
-        const SizedBox(height: 8.0,),
-        Image.asset(
-          imgPath,
-          width: 50.0,
-        ),
-        const SizedBox(height: 8.0,),
-        Text(level, style: ts,),
-        Text(stat, style: ts,),
-      ],
+    return SizedBox(
+      width: width,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            category,
+            style: ts,
+          ),
+          const SizedBox(height: 8.0,),
+          Image.asset(
+            imgPath,
+            width: 50.0,
+          ),
+          const SizedBox(height: 8.0,),
+          Text(level, style: ts,),
+          Text(stat, style: ts,),
+        ],
+      ),
     );
   }
 }
