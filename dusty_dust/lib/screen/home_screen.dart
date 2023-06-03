@@ -5,6 +5,7 @@ import 'package:dusty_dust/component/main_app_bar.dart';
 import 'package:dusty_dust/component/main_drawer.dart';
 import 'package:dusty_dust/const/colors.dart';
 import 'package:dusty_dust/const/data.dart';
+import 'package:dusty_dust/model/stat_model.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -35,6 +36,10 @@ class _HomeScreenState extends State<HomeScreen> {
         "dataGubun": "HOUR",
         "searchCondition": "WEEK",
       },
+    );
+
+    response.data["response"]["body"]["items"].map(
+      (item) => StatModel.fromJson(json: item),
     );
   }
 
