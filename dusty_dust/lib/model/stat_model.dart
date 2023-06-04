@@ -24,8 +24,8 @@ class StatModel {
   final double jeju;
   final double chungbuk;
   final double gyeongnam;
-  final DateTime dateTime;
-  final ItemCode itemcode;
+  final DateTime dataTime;
+  final ItemCode itemCode;
   final double gyeonggi;
 
   // JSON형태로부터 데이터를 받아온다.
@@ -46,8 +46,8 @@ class StatModel {
         jeju = double.parse(json['jeju'] ?? "0"),
         chungbuk = double.parse(json['chungbuk'] ?? "0"),
         gyeongnam = double.parse(json['gyeongnam'] ?? "0"),
-        dateTime = DateTime.parse(json["dateTime"]),
-        itemcode = parseItemCode(json["itemCode"]),
+        dataTime = DateTime.parse(json["dataTime"]),
+        itemCode = parseItemCode(json["itemCode"]),
         gyeonggi = double.parse(json["gyeonggi"] ?? "0");
 
   static ItemCode parseItemCode(String raw) {
