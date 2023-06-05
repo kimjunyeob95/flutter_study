@@ -5,6 +5,7 @@ import 'package:dusty_dust/component/main_drawer.dart';
 import 'package:dusty_dust/const/colors.dart';
 import 'package:dusty_dust/const/regions.dart';
 import 'package:dusty_dust/const/status_level.dart';
+import 'package:dusty_dust/model/stat_and_status_model.dart';
 import 'package:dusty_dust/model/stat_model.dart';
 import 'package:dusty_dust/repository/stat_repository.dart';
 import 'package:dusty_dust/utils/data_utils.dart';
@@ -30,9 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final results = await Future.wait(futures);
     int i = 0;
     for (ItemCode itemCode in ItemCode.values) {
-      stats.addAll({
-        itemCode: results[i]
-      });
+      stats.addAll({itemCode: results[i]});
       i++;
     }
 
@@ -71,6 +70,17 @@ class _HomeScreenState extends State<HomeScreen> {
             final status = DataUtils.getStatusFromItemCodeAndValue(
                 itemCode: pm10RecentStat.itemCode, value: pm10RecentStat.seoul);
 
+            final ssModel = stats.keys.map((key) {
+              final value = stats[key]!;
+              final stat = value[0];
+
+              return StatAndStatusModel(
+                  itemCode: key,
+                  stat: stat,
+                  status: DataUtils.getStatusFromItemCodeAndValue(
+                      itemCode: key, value: stat.getLevelFromRegion(region)));
+            }).toList();
+
             return CustomScrollView(
               slivers: [
                 MainAppBar(
@@ -79,7 +89,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      CategoryCard(),
+                      CategoryCard(
+                        region: region,
+                        models: ssModel,
+                      ),
                       const SizedBox(
                         height: 16.0,
                       ),
