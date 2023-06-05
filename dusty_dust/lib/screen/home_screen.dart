@@ -20,9 +20,23 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String region = regions[0];
 
-  Future<List<StatModel>> fetchData() async {
-    final statModels = await StatRepository.fetchData();
-    return statModels;
+  Future<Map<ItemCode, List<StatModel>>> fetchData() async {
+    Map<ItemCode, List<StatModel>> stats = {};
+
+    List<Future> futures = [];
+    for (ItemCode itemCode in ItemCode.values) {
+      futures.add(StatRepository.fetchData(itemCode: itemCode));
+    }
+    final results = await Future.wait(futures);
+    int i = 0;
+    for (ItemCode itemCode in ItemCode.values) {
+      stats.addAll({
+        itemCode: results[i]
+      });
+      i++;
+    }
+
+    return stats;
   }
 
   @override
@@ -38,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         region: region,
       ),
-      body: FutureBuilder<List<StatModel>>(
+      body: FutureBuilder<Map<ItemCode, List<StatModel>>>(
           future: fetchData(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
@@ -51,15 +65,16 @@ class _HomeScreenState extends State<HomeScreen> {
               return const Center(child: CircularProgressIndicator());
             }
 
-            List<StatModel> stats = snapshot.data!;
-            StatModel recentStat = stats[0];
+            Map<ItemCode, List<StatModel>> stats = snapshot.data!;
+            StatModel pm10RecentStat = stats[ItemCode.PM10]![0];
 
             final status = DataUtils.getStatusFromItemCodeAndValue(
-                itemCode: recentStat.itemCode, value: recentStat.seoul);
+                itemCode: pm10RecentStat.itemCode, value: pm10RecentStat.seoul);
 
             return CustomScrollView(
               slivers: [
-                MainAppBar(stat: recentStat, status: status, region: region),
+                MainAppBar(
+                    stat: pm10RecentStat, status: status, region: region),
                 SliverToBoxAdapter(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
