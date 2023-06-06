@@ -7,9 +7,16 @@ import 'main_stat.dart';
 
 class CategoryCard extends StatelessWidget {
   final String region;
+  final Color lightColor;
+  final Color darkColor;
   final List<StatAndStatusModel> models;
 
-  const CategoryCard({required this.region, required this.models, Key? key})
+  const CategoryCard(
+      {required this.lightColor,
+      required this.darkColor,
+      required this.region,
+      required this.models,
+      Key? key})
       : super(key: key);
 
   @override
@@ -17,11 +24,13 @@ class CategoryCard extends StatelessWidget {
     return SizedBox(
       height: 160,
       child: MainCard(
+        backgroudColor: lightColor,
         child: LayoutBuilder(builder: (context, constraint) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               CardTitle(
+                backgroundColor: darkColor,
                 title: "종류별 통계",
               ),
               Expanded(

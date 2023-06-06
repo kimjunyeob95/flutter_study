@@ -3,15 +3,18 @@ import 'package:flutter/material.dart';
 
 class CardTitle extends StatelessWidget {
   final String title;
+  final Color backgroundColor;
 
-  const CardTitle({required this.title, Key? key}) : super(key: key);
+  const CardTitle(
+      {required this.backgroundColor, required this.title, Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-        decoration: const BoxDecoration(
-            color: darkColor,
-            borderRadius: BorderRadius.only(
+        decoration: BoxDecoration(
+            color: backgroundColor,
+            borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16.0),
                 topRight: Radius.circular(16.0))),
         child: Padding(
@@ -19,7 +22,8 @@ class CardTitle extends StatelessWidget {
           child: Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+            style: const TextStyle(
+                color: Colors.white, fontWeight: FontWeight.w700),
           ),
         ));
   }

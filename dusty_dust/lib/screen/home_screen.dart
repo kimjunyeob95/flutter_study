@@ -41,7 +41,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: primaryColor,
       drawer: MainDrawer(
         onSelectedRegion: (String value) {
           setState(() {
@@ -67,8 +66,10 @@ class _HomeScreenState extends State<HomeScreen> {
             Map<ItemCode, List<StatModel>> stats = snapshot.data!;
             StatModel pm10RecentStat = stats[ItemCode.PM10]![0];
 
+            // 미세먼지 최근 데이터의 현재 상태
+            final regionStat = pm10RecentStat.getLevelFromRegion(region);
             final status = DataUtils.getStatusFromItemCodeAndValue(
-                itemCode: pm10RecentStat.itemCode, value: pm10RecentStat.seoul);
+                itemCode: pm10RecentStat.itemCode, value: regionStat);
 
             final ssModel = stats.keys.map((key) {
               final value = stats[key]!;
@@ -81,26 +82,48 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemCode: key, value: stat.getLevelFromRegion(region)));
             }).toList();
 
-            return CustomScrollView(
-              slivers: [
-                MainAppBar(
-                    stat: pm10RecentStat, status: status, region: region),
-                SliverToBoxAdapter(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      CategoryCard(
-                        region: region,
-                        models: ssModel,
-                      ),
-                      const SizedBox(
-                        height: 16.0,
-                      ),
-                      HourlyCard()
-                    ],
-                  ),
-                )
-              ],
+            return Container(
+              color: status.primaryColor,
+              child: CustomScrollView(
+                slivers: [
+                  MainAppBar(
+                      stat: pm10RecentStat, status: status, region: region),
+                  SliverToBoxAdapter(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        CategoryCard(
+                          region: region,
+                          models: ssModel,
+                          lightColor: status.lightColor,
+                          darkColor: status.darkColor,
+                        ),
+                        const SizedBox(
+                          height: 16.0,
+                        ),
+                        ...stats.keys.map((itemCode) {
+                          final stat = stats[itemCode]!;
+
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16.0),
+                            child: HourlyCard(
+                              lightColor: status.lightColor,
+                              darkColor: status.darkColor,
+                              region: region,
+                              category: DataUtils.getItemCodeKrString(
+                                  itemCode: itemCode),
+                              stats: stat,
+                            ),
+                          );
+                        }),
+                        const SizedBox(
+                          height: 16.0,
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
             );
           }),
     );
