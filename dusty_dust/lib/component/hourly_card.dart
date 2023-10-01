@@ -42,6 +42,7 @@ class HourlyCard extends StatelessWidget {
   Widget renderRow({required StatModel stat}) {
     final status = DataUtils.getStatusFromItemCodeAndValue(
         value: stat.getLevelFromRegion(region), itemCode: stat.itemCode);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
       child: Row(

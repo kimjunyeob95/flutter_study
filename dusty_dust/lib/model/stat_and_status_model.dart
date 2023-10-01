@@ -8,4 +8,9 @@ class StatAndStatusModel {
 
   StatAndStatusModel(
       {required this.itemCode, required this.stat, required this.status});
+
+  @override
+  String toString() {
+    return 'StatAndStatusModel(ItemCode: $itemCode, StatModel: $stat, StatusModel: $status)';
+  }
 }

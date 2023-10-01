@@ -50,22 +50,32 @@ class DataUtils {
 
   static StatusModel getStatusFromItemCodeAndValue(
       {required double value, required ItemCode itemCode}) {
-    return statusLevel.where((status) {
+
+    final filteredStatusList = statusLevel.where((status) {
       if (itemCode == ItemCode.PM10) {
-        return status.minFineDust < value;
+        return status.minFineDust <= value;
       } else if (itemCode == ItemCode.PM25) {
-        return status.minUltraFineDust < value;
+        return status.minUltraFineDust <= value;
       } else if (itemCode == ItemCode.CO) {
-        return status.minCO < value;
+        return status.minCO <= value;
       } else if (itemCode == ItemCode.NO2) {
-        return status.minNO2 < value;
+        return status.minNO2 <= value;
       } else if (itemCode == ItemCode.O3) {
-        return status.minO3 < value;
+        return status.minO3 <= value;
       } else if (itemCode == ItemCode.SO2) {
-        return status.minSO2 < value;
+        return status.minSO2 <= value;
       } else {
         throw Exception("알수없는 itemCode입니다.");
       }
-    }).last;
+    }).toList();
+
+    if (filteredStatusList.isNotEmpty) {
+      // 필터링된 목록이 비어 있지 않은 경우 마지막 요소를 반환
+      return filteredStatusList.last;
+    } else {
+      // 필터링된 목록이 비어 있으면 null 반환
+      print('itemCode: $itemCode / value: $value');
+     return statusLevel[0];
+    }
   }
 }

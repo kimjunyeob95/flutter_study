@@ -1,12 +1,18 @@
-import 'package:dusty_dust/const/colors.dart';
 import 'package:dusty_dust/const/regions.dart';
 import 'package:flutter/material.dart';
 
 class MainDrawer extends StatelessWidget {
   final String region;
   final void Function(String) onSelectedRegion;
+  final Color darkColor;
+  final Color lightColor;
 
-  const MainDrawer({required this.region, required this.onSelectedRegion, Key? key})
+  const MainDrawer(
+      {required this.region,
+      required this.onSelectedRegion,
+      required this.darkColor,
+      required this.lightColor,
+      Key? key})
       : super(key: key);
 
   @override
