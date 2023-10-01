@@ -1,22 +1,17 @@
 import 'package:dusty_dust/screen/home_screen.dart';
+import 'package:dusty_dust/screen/test_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-void main() {
-  runApp(const MyApp());
+const testBox = "test";
+
+void main() async {
+  await Hive.initFlutter();
+
+  await Hive.openBox(testBox);
+
+  runApp(MaterialApp(
+    theme: ThemeData(fontFamily: 'sunflower'),
+    home: const TestScreen(),
+  ));
 }
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        fontFamily: 'sunflower'
-      ),
-      home: HomeScreen(),
-    );
-  }
-}
-
